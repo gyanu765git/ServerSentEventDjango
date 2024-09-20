@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collect Data Stream</title>
+</head>
+<body>
+    <h1>Collect Data Stream</h1>
+    <div id="dataContainer"></div>
+
+    <script>
+        const eventSource = new EventSource("{% url 'collect_data_stream' %}");
+        const dataContainer = document.getElementById('dataContainer');
+
+        eventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            dataContainer.innerHTML = ''; 
+            if (data.length === 0) {
+                dataContainer.textContent = 'No data available';
+            } else {
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.textContent = `Name: ${item.name}`;
+                    dataContainer.appendChild(div);
+                });
+            }
+        };
+        eventSource.onerror = function(event) {
+            console.error("EventSource failed:", event);
+            eventSource.close();
+        };
+    </script>
+</body>
+</html>
